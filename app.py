@@ -78,12 +78,12 @@ if click:
     if query:
         # Generate embedding for the query
         query_embedding = model.encode(query)
-        results = index.query(vector=query_embedding.tolist(), top_k=5, include_metadata=True)
+        results = index.query(vector=query_embedding.tolist(), top_k=add_slider, include_metadata=True)
 
         st.subheader("Recommended Movies:")
         for match in results['matches']:
             metadata = match['metadata']
-            poster_url = metadata.get('PosterLink', "https://via.placeholder.com/150x220.png?text=No+Image")
+            poster_url = metadata.get('PosterLink', "https://static.vecteezy.com/system/resources/previews/007/459/267/non_2x/set-of-cinema-icons-movie-design-elements-with-a-cartoon-concept-illustration-free-vector.jpg")
             movie_card = f"""
             <div class="movie-card">
                 <img src="{poster_url}" alt="Movie Poster" class="movie-poster">

@@ -52,36 +52,52 @@ st.markdown(
       font-size: 20px;
       outline: none;
     }
+    div[data-testid="InputInstructions"] > span:nth-child(1) {
+    visibility: hidden;
+    }
+    div[data-testid="stButton"] {
+        margin-top: 27px !important;
+    }
     </style>
     """, unsafe_allow_html=True
 )
 
 st.markdown(
-    '<div class="header"><h1>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Semantic Search &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp IMDB Movies Dataset</h1></div>',
+    '<div class="header"><h1>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Semantic Search &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp IMDB Movies Dataset🎬</h1></div>',
     unsafe_allow_html=True)
 
-query = st.text_input("Search Movies 🔎",placeholder="Describe the type of movie you're looking for...")
 
-if query:
-    # Generate embedding for the query
-    query_embedding = model.encode(query)
-    results = index.query(vector=query_embedding.tolist(), top_k=5, include_metadata=True)
+c1,c2 = st.columns((4,1))
+with c1:
+    query = st.text_input("Enter your Search Query 🔍", placeholder="Describe the type of movie you're looking for...", key="Type Here ...")
+with c2:
+    click = st.button("Search 🚀")
+add_slider = st.slider("Select the number of recommendations", 1, 25, 5)
 
-    st.subheader("Recommended Movies:")
-    for match in results['matches']:
-        metadata = match['metadata']
-        poster_url = metadata.get('PosterLink', "https://via.placeholder.com/150x220.png?text=No+Image")
-        movie_card = f"""
-        <div class="movie-card">
-            <img src="{poster_url}" alt="Movie Poster" class="movie-poster">
-            <div class="movie-details">
-                <div class="movie-title">{metadata.get('Series_Title', 'Unknown Title')}</div>
-                <div class="movie-detail"><strong>Year:</strong> {metadata.get('Year', 'N/A')}</div>
-                <div class="movie-detail"><strong>Genre:</strong> {metadata.get('Genre', 'N/A')}</div>
-                <div class="movie-detail"><strong>Director:</strong> {metadata.get('Director', 'N/A')}</div>
-                <div class="movie-detail"><strong>Starring:</strong> {metadata.get('Star1', '')}, {metadata.get('Star2', '')}, {metadata.get('Star3', '')}, {metadata.get('Star4', '')}</div>
-                <div class="movie-detail"><strong>Description:</strong> {metadata.get('Overview', 'No description available')}</div>
+if click:
+    if query:
+        # Generate embedding for the query
+        query_embedding = model.encode(query)
+        results = index.query(vector=query_embedding.tolist(), top_k=5, include_metadata=True)
+
+        st.subheader("Recommended Movies:")
+        for match in results['matches']:
+            metadata = match['metadata']
+            poster_url = metadata.get('PosterLink', "https://via.placeholder.com/150x220.png?text=No+Image")
+            movie_card = f"""
+            <div class="movie-card">
+                <img src="{poster_url}" alt="Movie Poster" class="movie-poster">
+                <div class="movie-details">
+                    <div class="movie-title">{metadata.get('Series_Title', 'Unknown Title')}</div>
+                    <div class="movie-detail"><strong>Year:</strong> {metadata.get('Year', 'N/A')}</div>
+                    <div class="movie-detail"><strong>Genre:</strong> {metadata.get('Genre', 'N/A')}</div>
+                    <div class="movie-detail"><strong>Rating:</strong> {metadata.get('Rating', 'N/A')} ⭐️</div>
+                    <div class="movie-detail"><strong>Director:</strong> {metadata.get('Director', 'N/A')}</div>
+                    <div class="movie-detail"><strong>Starring:</strong> {metadata.get('Star1', '')}, {metadata.get('Star2', '')}, {metadata.get('Star3', '')}, {metadata.get('Star4', '')}</div>
+                    <div class="movie-detail"><strong>Description:</strong> {metadata.get('Overview', 'No description available')}</div>
+                </div>
             </div>
-        </div>
-        """
-        st.markdown(movie_card, unsafe_allow_html=True)
+            """
+            st.markdown(movie_card, unsafe_allow_html=True)
+    else:
+        st.write("⚠️ Please enter a search query")
